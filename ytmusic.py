@@ -7,7 +7,7 @@ from pythumb import Thumbnail
 import mutagen
 
 # ----------------
-AUDIO_DOWNLOAD_DIR ="/Users/prld/gPrld/Music/#ytmusic_script"
+DOWNLOAD_DIR ="/Users/prld/gPrld/Music/#ytmusic_script"
 # ----------------
 
 #%%
@@ -15,13 +15,13 @@ def YoutubeAudioDownload(url):
     '''
     Codec : 
     - alac : apple lossless 
-    - aac base codec
+    - aac : base codec
     '''    
     yt = YouTube(url)
     audio = yt.streams.filter(only_audio = True, abr="160kbps")[0]
     if audio!=[]:
         try:
-            FOLDER = AUDIO_DOWNLOAD_DIR+"/"+yt.title
+            FOLDER = DOWNLOAD_DIR+"/"+yt.title
             
             if not os.path.exists(FOLDER):
                 os.makedirs(FOLDER)
@@ -64,6 +64,35 @@ def YoutubeAudioDownload(url):
         print(f"160kbps not available - {yt.title}")
 
     return audio
+
+def YoutubeVideoDownload(url):
+    '''
+    Codec : 
+    - alac : apple lossless 
+    - aac : base codec
+    '''    
+    yt = YouTube(url)
+    res = {0:"2160p",1:"1440p",2:"1080p",3:"720p"}
+    c = 0
+    query = yt.streams.filter(only_video = True, res=res[c])
+    while len(query)==0:
+        c+=1
+        query = yt.streams.filter(only_video = True, res=res[c])
+        
+    video = query[0]
+    try:
+        FOLDER = DOWNLOAD_DIR+"/"+yt.title
+        
+        if not os.path.exists(FOLDER):
+            os.makedirs(FOLDER)
+            print('>>>Downloading...\n')
+            video.download(FOLDER)
+            print('>>>Done!\n')
+    except:
+        print(f"Video failure - {yt.title}")
+
+
+    return 
 
 
 def meta_downloader():

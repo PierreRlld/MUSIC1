@@ -7,21 +7,26 @@ from pythumb import Thumbnail
 import mutagen
 
 # ----------------
-DOWNLOAD_DIR ="/Users/prld/gPrld/Music/#ytmusic_script"
+global AUDIO_DOWNLOAD_DIR, VIDEO_DOWNLOAD_DIR
+AUDIO_DOWNLOAD_DIR = "/Users/prld/gPrld/Music/#ytmusic_script/AUDIO"
+VIDEO_DOWNLOAD_DIR = "/Users/prld/gPrld/Music/#ytmusic_script/VIDEO"
 # ----------------
 
 #%%
+#! --------------------------------------
 def YoutubeAudioDownload(url):
     '''
     Codec : 
     - alac : apple lossless 
-    - aac : base codec
+    - aac base codec
     '''    
     yt = YouTube(url)
     audio = yt.streams.filter(only_audio = True, abr="160kbps")[0]
+    
     if audio!=[]:
         try:
-            FOLDER = DOWNLOAD_DIR+"/"+yt.title
+            unique = " _"+str(len(os.listdir(AUDIO_DOWNLOAD_DIR)))
+            FOLDER = AUDIO_DOWNLOAD_DIR+"/"+yt.title+unique
             
             if not os.path.exists(FOLDER):
                 os.makedirs(FOLDER)
@@ -65,24 +70,25 @@ def YoutubeAudioDownload(url):
 
     return audio
 
+
+#! --------------------------------------
 def YoutubeVideoDownload(url):
     '''
-    Codec : 
-    - alac : apple lossless 
-    - aac : base codec
+
     '''    
     yt = YouTube(url)
     res = {0:"2160p",1:"1440p",2:"1080p",3:"720p"}
     c = 0
     query = yt.streams.filter(only_video = True, res=res[c])
+    
     while len(query)==0:
         c+=1
         query = yt.streams.filter(only_video = True, res=res[c])
-        
     video = query[0]
+    
     try:
-        FOLDER = DOWNLOAD_DIR+"/"+yt.title
-        
+        unique = " _"+str(len(os.listdir(VIDEO_DOWNLOAD_DIR)))
+        FOLDER = VIDEO_DOWNLOAD_DIR+"/"+yt.title+unique
         if not os.path.exists(FOLDER):
             os.makedirs(FOLDER)
             print('>>>Downloading...\n')
@@ -91,10 +97,10 @@ def YoutubeVideoDownload(url):
     except:
         print(f"Video failure - {yt.title}")
 
+    return video
 
-    return 
 
-
+#! --------------------------------------
 def meta_downloader():
     parser = argparse.ArgumentParser()
     parser.add_argument('-url', '-u', nargs='?', help='Specify url')
@@ -114,6 +120,7 @@ def meta_downloader():
         channel = Channel(str(args.url))
         for video in channel.video_urls:
             YoutubeAudioDownload(url=video)
+            
             
 #ffmpeg -i "/Users/prld/gPrld/Music/ytmusic_script/Mabisyo - Sun Colored Eyes.webm" "/Users/prld/gPrld/Music/ytmusic_script/Mabisyo - Sun Colored Eyes.mp3"
 #ffmpeg -i "/Users/prld/gPrld/Music/#ytmusic_script/Mabisyo - Sun Colored Eyes.webm" -c:a alac -b:a 160k "/Users/prld/gPrld/Music/#ytmusic_script/Mabisyo - Sun Colored Eyes.m4a"
